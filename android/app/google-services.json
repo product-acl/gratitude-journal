@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "263734321340",
+    "project_id": "thirty-sec-gratitude-journal",
+    "storage_bucket": "thirty-sec-gratitude-journal.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263734321340:android:783d66c06e197e8b2630b9",
+        "android_client_info": {
+          "package_name": "com.diazleonardoacl.gratitudejournal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbn0myP5prsChAbnWpBFj62uhFZ9mrM1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

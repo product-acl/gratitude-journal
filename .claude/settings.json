@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(while read pid)",
+      "Bash(do lsof -p $pid)",
+      "Bash(done)",
+      "Bash(git status:*)"
+    ],
+    "additionalDirectories": [
+      "/var/folders/qv/54pn8g3n2w53fscrnfxt03j00000gn/T/eas-cli-nodejs",
+      "/Users/diazleonardo/Documents/Scripts/ACL/30-Second Gratitude Journal/.git"
+    ]
+  }
+}

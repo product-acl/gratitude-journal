@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   },
   streakPill: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
     backgroundColor: '#EEF2FF',
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -138,15 +139,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    fontSize: 13,
+    fontSize: 16,
     color: '#4B5563',
+    fontWeight: '500',
   },
   input: {
     borderWidth: 1,
     borderColor: '#D1D5DB',
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingVertical: 14,
+    fontSize: 18,
     borderRadius: 10,
   },
   footer: {
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
   },
   savedText: {

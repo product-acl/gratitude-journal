@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -223,7 +224,7 @@ export function Settings({ onExport, isPremium, isTrialActive, trialDaysRemainin
         <Text style={styles.title}>Settings</Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* Premium Status */}
         {isPremium ? (
           <View style={styles.premiumBox}>
@@ -356,7 +357,7 @@ export function Settings({ onExport, isPremium, isTrialActive, trialDaysRemainin
         </View>
 
         <Text style={styles.footerText}>All entries stored locally on your device</Text>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -376,8 +377,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '600',
   },
+  scrollView: {
+    flex: 1,
+  },
   content: {
     gap: 14,
+    paddingBottom: 16,
   },
 
   row: {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, Share, StyleSheet, Text, View, Platform } from 'react-native';
+import { Alert, AppState, Pressable, Share, StyleSheet, Text, View, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
@@ -14,9 +14,12 @@ import { Paywall } from './components/Paywall';
 import type { Entry } from './components/History';
 import { usePurchase } from './hooks/usePurchase';
 import { Analytics } from './services/analytics';
+import * as StoreReview from 'expo-store-review';
 
 type Screen = 'home' | 'history' | 'settings';
 const STORAGE_KEY = 'gratitude-entries';
+const RATING_LAST_MILESTONE_KEY = 'rating-last-milestone';
+const RATING_MILESTONES = [3, 10, 30];
 const NAV_HEIGHT = 72;
 
 function App() {
@@ -24,6 +27,7 @@ function App() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<Entry | null>(null);
   const [streak, setStreak] = useState(0);
+  const [dateKey, setDateKey] = useState(() => new Date().toDateString());
   const insets = useSafeAreaInsets();
 
   // Track screen changes
@@ -101,6 +105,17 @@ function App() {
     }
   };
 
+  // Recalculate streak when app returns to foreground on a new day
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') {
+        const now = new Date().toDateString();
+        setDateKey(prev => prev !== now ? now : prev);
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
   // Calculate streak
   useEffect(() => {
     if (entries.length === 0) {
@@ -108,22 +123,36 @@ function App() {
       return;
     }
 
-    const sortedEntries = [...entries].sort((a, b) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    const oneDayMs = 86400000;
 
-    let currentStreak = 0;
+    // Deduplicate entry dates (normalized to midnight), sorted newest first
+    const uniqueDates = [
+      ...new Set(
+        entries.map((e) => {
+          const d = new Date(e.date);
+          d.setHours(0, 0, 0, 0);
+          return d.getTime();
+        })
+      ),
+    ].sort((a, b) => b - a);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const todayMs = today.getTime();
 
-    for (let i = 0; i < sortedEntries.length; i++) {
-      const entryDate = new Date(sortedEntries[i].date);
-      entryDate.setHours(0, 0, 0, 0);
+    const mostRecentDate = uniqueDates[0];
 
-      const expectedDate = new Date(today);
-      expectedDate.setDate(expectedDate.getDate() - i);
+    // If most recent entry is older than yesterday, streak is broken
+    if (mostRecentDate < todayMs - oneDayMs) {
+      setStreak(0);
+      return;
+    }
 
-      if (entryDate.getTime() === expectedDate.getTime()) {
+    // Count consecutive days starting from the most recent entry date
+    let currentStreak = 0;
+    for (let i = 0; i < uniqueDates.length; i++) {
+      const expectedDate = mostRecentDate - i * oneDayMs;
+      if (uniqueDates[i] === expectedDate) {
         currentStreak++;
       } else {
         break;
@@ -136,7 +165,21 @@ function App() {
     if (currentStreak > 0) {
       void Analytics.logStreakMilestone(currentStreak);
     }
-  }, [entries]);
+  }, [entries, dateKey]);
+
+  const maybeRequestReview = async (totalEntries: number) => {
+    if (!RATING_MILESTONES.includes(totalEntries)) return;
+    try {
+      const lastMilestone = await AsyncStorage.getItem(RATING_LAST_MILESTONE_KEY);
+      if (lastMilestone && parseInt(lastMilestone) >= totalEntries) return;
+      const isAvailable = await StoreReview.isAvailableAsync();
+      if (!isAvailable && !__DEV__) return;
+      await AsyncStorage.setItem(RATING_LAST_MILESTONE_KEY, String(totalEntries));
+      await StoreReview.requestReview();
+    } catch (error) {
+      console.warn('Failed to request review', error);
+    }
+  };
 
   const handleSaveEntry = (entry: { grateful: string; goodToday: string; appreciate: string }) => {
     const newEntry: Entry = {
@@ -150,6 +193,9 @@ function App() {
 
     // Track entry creation
     void Analytics.logEntryCreated();
+
+    // Prompt for app store review after 3rd entry
+    void maybeRequestReview(updatedEntries.length);
   };
 
   const handleDeleteEntry = (entryId: string) => {
@@ -295,7 +341,11 @@ function App() {
       {purchase.showPaywall && !purchase.isLoading && (
         <View style={[StyleSheet.absoluteFill, styles.paywallOverlay]}>
           <Paywall
-            onStartTrial={handlePurchase}
+            onStartTrial={() => {
+              void Analytics.logPaywallDismiss(purchase.trialDaysRemaining);
+              purchase.dismissPaywall();
+            }}
+            onPurchase={handlePurchase}
             onRestore={handleRestorePurchase}
             trialDaysRemaining={purchase.trialDaysRemaining}
             price={purchase.price}
@@ -349,7 +399,7 @@ function App() {
               pressed && styles.navButtonPressed,
             ]}
           >
-            <Feather name="home" size={24} color={currentScreen === 'home' ? '#4F46E5' : '#9CA3AF'} />
+            <Feather name="home" size={30} color={currentScreen === 'home' ? '#4F46E5' : '#9CA3AF'} />
             <Text style={[styles.navLabel, currentScreen === 'home' && styles.navLabelActive]}>Home</Text>
           </Pressable>
 
@@ -360,7 +410,7 @@ function App() {
               pressed && styles.navButtonPressed,
             ]}
           >
-            <Feather name="clock" size={24} color={currentScreen === 'history' ? '#4F46E5' : '#9CA3AF'} />
+            <Feather name="clock" size={30} color={currentScreen === 'history' ? '#4F46E5' : '#9CA3AF'} />
             <Text style={[styles.navLabel, currentScreen === 'history' && styles.navLabelActive]}>
               History
             </Text>
@@ -373,7 +423,7 @@ function App() {
               pressed && styles.navButtonPressed,
             ]}
           >
-            <Feather name="settings" size={24} color={currentScreen === 'settings' ? '#4F46E5' : '#9CA3AF'} />
+            <Feather name="settings" size={30} color={currentScreen === 'settings' ? '#4F46E5' : '#9CA3AF'} />
             <Text style={[styles.navLabel, currentScreen === 'settings' && styles.navLabelActive]}>
               Settings
             </Text>
@@ -430,7 +480,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   navLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#9CA3AF',
   },
   navLabelActive: {

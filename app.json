@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gratitude Journal",
     "slug": "gratitude-journal",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,29 +15,42 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.diazleonardoacl.gratitudejournal",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "buildNumber": "6"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#9B8EC4"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.diazleonardoacl.gratitudejournal",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 37
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "@react-native-community/datetimepicker",
-      "@react-native-firebase/app"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
         "projectId": "358fe540-e457-4cea-a66a-e4f2692dc877"
       }
     },
-    "owner": "diazleonardoacl"
+    "owner": "diazleonardoacl",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/358fe540-e457-4cea-a66a-e4f2692dc877"
+    }
   }
 }
