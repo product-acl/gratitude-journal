@@ -47,7 +47,7 @@ export function Home({ streak, onSave }: HomeProps) {
       <View style={styles.header}>
         <Text style={styles.title}>Today’s Gratitude</Text>
         <View style={styles.streakPill}>
-          <Text style={styles.streakText}>🔥 {streak}-day streak</Text>
+          <Text style={styles.streakText} numberOfLines={1}>🔥 {streak}-day streak</Text>
         </View>
       </View>
 
