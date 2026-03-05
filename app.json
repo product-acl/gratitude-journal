@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.diazleonardoacl.gratitudejournal",
       "googleServicesFile": "./GoogleService-Info.plist",
-      "buildNumber": "28"
+      "buildNumber": "29"
     },
     "android": {
       "adaptiveIcon": {
