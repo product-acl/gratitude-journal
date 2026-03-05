@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gratitude Journal",
     "slug": "gratitude-journal",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.diazleonardoacl.gratitudejournal",
       "googleServicesFile": "./GoogleService-Info.plist",
-      "buildNumber": "8"
+      "buildNumber": "9"
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +26,7 @@
       "edgeToEdgeEnabled": true,
       "package": "com.diazleonardoacl.gratitudejournal",
       "googleServicesFile": "./google-services.json",
-      "versionCode": 39
+      "versionCode": 40
     },
     "web": {
       "favicon": "./assets/favicon.png"
