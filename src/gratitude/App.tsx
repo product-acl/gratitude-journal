@@ -268,8 +268,6 @@ function App() {
 
       const success = await purchase.completePurchase();
       if (success) {
-        // Track successful purchase
-        void Analytics.logPurchaseComplete(purchase.price);
         void Analytics.setUserPremiumStatus(true);
 
         Alert.alert('Success!', 'Thank you for your purchase! You now have lifetime access.');

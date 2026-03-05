@@ -12,6 +12,7 @@ import {
   getAvailablePurchases,
 } from 'react-native-iap';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Analytics } from './analytics';
 
 // Product IDs - IMPORTANT: These must match your App Store Connect and Play Console products
 const PRODUCT_IDS = {
@@ -31,6 +32,7 @@ export class PurchaseManager {
   private purchaseUpdateSubscription: any = null;
   private purchaseErrorSubscription: any = null;
   private isInitialized = false;
+  private cachedPrice = '$9.99';
 
   private constructor() {}
 
@@ -86,6 +88,9 @@ export class PurchaseManager {
 
         // Finish the transaction
         await finishTransaction({ purchase, isConsumable: false });
+
+        // Log purchase only after confirmed by the store
+        void Analytics.logPurchaseComplete(this.cachedPrice);
       }
     } catch (error) {
       console.error('Error handling purchase update:', error);
@@ -98,7 +103,11 @@ export class PurchaseManager {
       const products = await getProducts({ skus: [productId] });
 
       if (products && products.length > 0) {
-        return products[0];
+        const product = products[0];
+        if (product.localizedPrice) {
+          this.cachedPrice = product.localizedPrice;
+        }
+        return product;
       }
       return null;
     } catch (error) {
